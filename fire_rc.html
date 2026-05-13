@@ -1,0 +1,206 @@
+
+<h2 class="sr-only">65세 전 FIRE 현금흐름 계산기. 소피아 만42세, 남편 만47세, 2027년 2월 퇴사 기준으로 소피아 65세까지 23년간 필요 자금을 시뮬레이션합니다.</h2>
+<style>
+.fw{font-family:var(--font-sans);padding:4px 0}
+.sec-lbl{font-size:11px;color:var(--color-text-tertiary);margin:18px 0 10px}
+.sec-lbl:first-of-type{margin-top:0}
+.g2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+.g2s{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.mc{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px 16px}
+.ml{font-size:12px;color:var(--color-text-secondary);margin-bottom:5px}
+.mv{font-size:22px;font-weight:500}
+.ms{font-size:11px;color:var(--color-text-tertiary);margin-top:3px}
+.sr{margin-bottom:14px}
+.st{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px}
+.slbl{font-size:13px;color:var(--color-text-secondary)}
+.ssub{font-size:11px;color:var(--color-text-tertiary)}
+.sval{font-size:14px;font-weight:500;color:var(--color-text-primary);white-space:nowrap;margin-left:8px}
+.mrow{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;font-size:12px;color:var(--color-text-secondary);border-bottom:0.5px solid var(--color-border-tertiary)}
+.mrow:last-child{border-bottom:none}
+.bdg{font-size:11px;padding:1px 7px;border-radius:var(--border-radius-md);display:inline-block}
+.yt{width:100%;border-collapse:collapse;font-size:12px}
+.yt th{padding:6px 8px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);font-weight:500;text-align:right;white-space:nowrap}
+.yt th:nth-child(1),.yt th:nth-child(2){text-align:left}
+.yt td{padding:6px 8px;border-bottom:0.5px solid var(--color-border-tertiary);text-align:right;white-space:nowrap}
+.yt td:nth-child(1),.yt td:nth-child(2){text-align:left}
+@media(max-width:600px){.g2{grid-template-columns:1fr}}
+</style>
+
+<div class="fw">
+<div class="g2">
+  <div>
+    <div class="sec-lbl">입력값</div>
+    <div class="sr">
+      <div class="st"><div><div class="slbl">40대 월 생활비</div><div class="ssub">2027–2034 · 소피아 42–49세</div></div><div class="sval"><span id="v40">550</span>만원</div></div>
+      <input type="range" id="r40" min="300" max="800" step="10" value="550" style="width:100%">
+    </div>
+    <div class="sr">
+      <div class="st"><div><div class="slbl">50대+ 월 생활비</div><div class="ssub">2035–2049 · 소피아 50–64세</div></div><div class="sval"><span id="v50">500</span>만원</div></div>
+      <input type="range" id="r50" min="300" max="700" step="10" value="500" style="width:100%">
+    </div>
+    <div class="sr">
+      <div class="st"><div><div class="slbl">연간 투자수익률</div><div class="ssub">명목 기준 (물가 2.5% 포함)</div></div><div class="sval"><span id="vr">7.0</span>%</div></div>
+      <input type="range" id="rr" min="3" max="10" step="0.5" value="7" style="width:100%">
+    </div>
+    <div class="sr">
+      <div class="st"><div><div class="slbl">퇴사 시 보유 자산</div><div class="ssub">투자 가능한 금융자산</div></div><div class="sval"><span id="va">15.0</span>억</div></div>
+      <input type="range" id="ra" min="1" max="60" step="0.5" value="15" style="width:100%">
+    </div>
+  </div>
+
+  <div>
+    <div class="sec-lbl">결과 요약</div>
+    <div class="g2s" style="margin-bottom:10px">
+      <div class="mc"><div class="ml">필요 자산</div><div class="mv" id="req-v">—</div><div class="ms">현재가치 기준</div></div>
+      <div class="mc"><div class="ml">보유 자산</div><div class="mv" id="hold-v" style="color:var(--color-text-info)">—</div><div class="ms">금융자산 기준</div></div>
+    </div>
+    <div class="mc" id="gap-card" style="margin-bottom:10px">
+      <div class="ml" id="gap-l">—</div>
+      <div class="mv" id="gap-v">—</div>
+      <div class="ms" id="gap-s">—</div>
+    </div>
+    <div style="border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md)">
+      <div class="mrow"><span>남편 국민연금 수급</span><span style="color:var(--color-text-info);font-weight:500">2044년 6월~</span></div>
+      <div class="mrow"><span>소피아 국민연금 수급</span><span style="color:var(--color-text-warning);font-weight:500">2050년 1월~</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="sec-lbl">자산 잔액 추이 (억원)</div>
+<div style="position:relative;width:100%;height:220px">
+  <canvas id="bc" role="img" aria-label="2027년부터 2049년까지 연도별 자산 잔액 추이 차트">연도별 자산 잔액 추이</canvas>
+</div>
+
+<div class="sec-lbl">연도별 상세</div>
+<div style="overflow-x:auto">
+  <table class="yt">
+    <thead><tr><th>연도</th><th>소피아 나이</th><th>구분</th><th>명목 월 생활비</th><th>연간 지출</th><th>연말 잔액</th></tr></thead>
+    <tbody id="tb"></tbody>
+  </table>
+</div>
+<div style="font-size:11px;color:var(--color-text-tertiary);margin-top:10px">★ 2044년: 남편 만 65세, 국민연금 수급 예정 (계산 미반영) · 2050년~: 국민연금 + 주택연금으로 전환</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const INFL=0.025,RY=2027,NY=23,T50=8,TH65=17;
+let chart=null,curRows=[];
+
+function calcAll(e40,e50,r,ass){
+  let bal=ass*10000,ro=null;const rows=[];
+  for(let t=0;t<NY;t++){
+    const yr=RY+t,in40=t<T50;
+    const nm=Math.round((in40?e40:e50)*Math.pow(1+INFL,t+1));
+    const ae=nm*12,ret=Math.max(0,bal)*(r/100);
+    bal=bal+ret-ae;
+    if(bal<0&&!ro)ro=yr;
+    rows.push({yr,age:42+t,in40,h65:t===TH65,nm,ae,bal:bal/10000});
+  }
+  let pv=0;
+  for(let t=0;t<NY;t++){
+    const ae=(t<T50?e40:e50)*Math.pow(1+INFL,t+1)*12;
+    pv+=ae/Math.pow(1+r/100,t+1);
+  }
+  return{rows,req:pv/10000,runOut:ro,fb:rows[NY-1].bal};
+}
+
+function update(){
+  const e40=+r40.value,e50=+r50.value,r=+rr.value,ass=+ra.value;
+  document.getElementById('v40').textContent=e40.toLocaleString();
+  document.getElementById('v50').textContent=e50.toLocaleString();
+  document.getElementById('vr').textContent=r.toFixed(1);
+  document.getElementById('va').textContent=ass.toFixed(1);
+
+  const{rows,req,runOut,fb}=calcAll(e40,e50,r,ass);
+  curRows=rows;
+  const gap=ass-req,ok=gap>=0;
+
+  document.getElementById('req-v').textContent=req.toFixed(1)+'억';
+  document.getElementById('hold-v').textContent=ass.toFixed(1)+'억';
+
+  const gc=document.getElementById('gap-card');
+  const gl=document.getElementById('gap-l');
+  const gv=document.getElementById('gap-v');
+  const gs=document.getElementById('gap-s');
+  gc.style.background=ok?'var(--color-background-success)':'var(--color-background-danger)';
+  gl.style.color=ok?'var(--color-text-success)':'var(--color-text-danger)';
+  gl.textContent=ok?'여유 자금':'부족 자금';
+  gv.style.color=ok?'var(--color-text-success)':'var(--color-text-danger)';
+  gv.textContent=(ok?'+':'')+gap.toFixed(1)+'억원';
+  gs.style.color=ok?'var(--color-text-success)':'var(--color-text-danger)';
+  gs.textContent=ok?`65세 도달 시 잔액 약 ${fb.toFixed(1)}억 예상`:(runOut?`${runOut}년 자산 소진 (소피아 ${runOut-RY+42}세)`:'');
+
+  const lbls=rows.map(r=>`'${String(r.yr).slice(2)}`);
+  const bals=rows.map(r=>Math.max(0,parseFloat(r.bal.toFixed(1))));
+  const isDk=matchMedia('(prefers-color-scheme: dark)').matches;
+  const lineC='#BA7517',fillC=isDk?'rgba(186,117,23,0.2)':'rgba(186,117,23,0.1)';
+  const gridC=isDk?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.05)';
+  const tickC=isDk?'#888':'#bbb';
+
+  const h65p={
+    id:'h65',
+    afterDraw(ch){
+      const meta=ch.getDatasetMeta(0);
+      if(!meta.data[TH65])return;
+      const{ctx,chartArea:{top,bottom}}=ch;
+      const x=meta.data[TH65].x;
+      const dk=matchMedia('(prefers-color-scheme: dark)').matches;
+      ctx.save();
+      ctx.strokeStyle=dk?'rgba(147,197,253,0.65)':'rgba(37,99,235,0.45)';
+      ctx.setLineDash([4,4]);ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.moveTo(x,top);ctx.lineTo(x,bottom);ctx.stroke();
+      ctx.fillStyle=dk?'rgba(147,197,253,0.9)':'rgba(37,99,235,0.75)';
+      ctx.font='10px sans-serif';ctx.textAlign='left';
+      ctx.fillText('남편 65세',x+4,top+14);
+      ctx.restore();
+    }
+  };
+
+  if(chart){chart.destroy();chart=null;}
+  chart=new Chart(document.getElementById('bc'),{
+    type:'line',
+    data:{
+      labels:lbls,
+      datasets:[{label:'잔액',data:bals,borderColor:lineC,backgroundColor:fillC,fill:true,tension:0.35,pointRadius:2,pointHoverRadius:4,borderWidth:2}]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{
+          title:items=>`${curRows[items[0].dataIndex].yr}년 · 소피아 ${curRows[items[0].dataIndex].age}세`,
+          label:item=>` ${item.raw.toFixed(1)}억원`
+        }}
+      },
+      scales:{
+        x:{grid:{color:gridC},ticks:{color:tickC,font:{size:11},maxTicksLimit:12}},
+        y:{grid:{color:gridC},ticks:{color:tickC,font:{size:11},callback:v=>v+'억'},beginAtZero:true}
+      }
+    },
+    plugins:[h65p]
+  });
+
+  const tb=document.getElementById('tb');
+  tb.innerHTML='';
+  rows.forEach(row=>{
+    const tr=document.createElement('tr');
+    if(row.h65)tr.style.background='var(--color-background-info)';
+    const bc=row.bal<0?'var(--color-text-danger)':row.bal<3?'var(--color-text-warning)':'var(--color-text-success)';
+    const bbg=row.in40?'var(--color-background-warning)':'var(--color-background-info)';
+    const btc=row.in40?'var(--color-text-warning)':'var(--color-text-info)';
+    tr.innerHTML=`
+      <td style="color:${row.h65?'var(--color-text-info)':'var(--color-text-secondary)'};font-weight:${row.h65?500:400}">${row.yr}${row.h65?' ★':''}</td>
+      <td style="color:var(--color-text-secondary)">만 ${row.age}세</td>
+      <td><span class="bdg" style="background:${bbg};color:${btc}">${row.in40?'40대':'50대+'}</span></td>
+      <td>${row.nm.toLocaleString()}만원</td>
+      <td style="color:var(--color-text-secondary)">${(row.ae/10000).toFixed(2)}억</td>
+      <td style="font-weight:500;color:${bc}">${row.bal<0?'▼ ':''}${row.bal.toFixed(1)}억</td>
+    `;
+    tb.appendChild(tr);
+  });
+}
+
+const[r40,r50,rr,ra]=['r40','r50','rr','ra'].map(id=>document.getElementById(id));
+[r40,r50,rr,ra].forEach(el=>el.addEventListener('input',update));
+update();
+</script>
